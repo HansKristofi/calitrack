@@ -141,11 +141,22 @@ db.auth.onAuthStateChange(async (event, session) => {
     currentUser = session.user;
     await bootApp();
   } else {
+    currentUser = null;
     showLoading(false);
     document.getElementById('app').style.display         = 'none';
     document.getElementById('auth-screen').style.display = '';
   }
 });
+
+// Fallback: if Supabase never fires onAuthStateChange (e.g. network issues),
+// hide the loader after 5s so the user isn't stuck on a blank screen
+setTimeout(() => {
+  const overlay = document.getElementById('loading-overlay');
+  if (!overlay.classList.contains('hidden')) {
+    showLoading(false);
+    document.getElementById('auth-screen').style.display = '';
+  }
+}, 5000);
 
 async function bootApp() {
   // Ensure profile row exists
